@@ -1,0 +1,350 @@
+import 'package:flutter/material.dart';
+import 'package:logger/logger.dart';
+import 'package:pizza_management/UI/checkout/checkout.dart';
+import 'package:pizza_management/data/api/api_constant.dart';
+import 'package:pizza_management/data/model/cart_item.dart';
+import 'package:pizza_management/data/repository/cart_repository.dart';
+import 'package:pizza_management/data/request/cart_item_request.dart';
+
+
+class CartScreen extends StatefulWidget {
+  const CartScreen({super.key});
+
+  @override
+  State<CartScreen> createState() => _CartScreenState();
+}
+
+class _CartScreenState extends State<CartScreen> {
+  List<CartItem> cartItems = [];
+  bool isLoading = true;
+  final log = Logger();
+  final _cartRepository = CartRepository();
+
+  @override
+  void initState() {
+    super.initState();
+    loadCart();
+  }
+
+  Future<void> loadCart() async {
+    try {
+      final data = await _cartRepository.getCartItems();
+      if (!mounted) return;
+      setState(() {
+        cartItems = data;
+        isLoading = false;
+      });
+    }
+    catch(e) {
+      log.e('Load Cart Failed: $e');
+      if (!mounted) return;
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  Future<void> _showDeleteDialog (CartItem item) async {
+    final result = await showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete Item'),
+        backgroundColor: const Color(0xFFF8F9FA),
+        content: const Text('Are you sure you want to delete this item?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Delete'),
+          ),
+        ]
+      ),
+    );
+    if (result == true) {
+      try {
+        final success = await _cartRepository.deleteCartItem(item.id);
+        if (success) {
+          await loadCart();
+        }
+      }
+      catch(e) {
+        log.e('Delete Cart Item Failed: $e');
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(),
+      );
+    }
+
+    if (cartItems.isEmpty) {
+      return const Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.shopping_cart,
+              size: 90,
+              color: Colors.grey,
+            ),
+            SizedBox(height: 15),
+            Text(
+              'Your cart is empty',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+    return SafeArea(
+      child: Column(
+        children: [
+          const SizedBox(height: 20),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Row(
+              children: [
+                const SizedBox(width: 20),
+                const Icon(
+                  Icons.shopping_cart_checkout,
+                  color: Colors.red,
+                  size: 30,
+                ),
+                const SizedBox(width: 10),
+                const Text(
+                  "My Cart",
+                  style: TextStyle(
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 20),
+          Expanded(
+            child: RefreshIndicator(
+              onRefresh: loadCart,
+              child: ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 8),
+                itemCount: cartItems.length,
+                itemBuilder: (context, index) {
+                  final item = cartItems[index];
+                  return Card(
+                    margin: const EdgeInsets.only(bottom: 15),
+                    elevation: 8,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12),
+                      child: Row(
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: Image.network(
+                              ApiConstant.pizzaImage(item.pizza!.image),
+                              width: 90,
+                              height: 90,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  item.pizza!.name,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  "\$${item.pizza!.price.toStringAsFixed(2)}",
+                                  style: const TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 17,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  'Subtotal \$${(item.pizza!.price * item.quantity).toStringAsFixed(2)}',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.grey.withAlpha(80),
+                                  ),
+                                ),
+                                const SizedBox(height: 10),
+                                Container(
+                                  margin: const EdgeInsets.only(top: 12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey.shade100,
+                                    borderRadius: BorderRadius.circular(30),
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.remove),
+                                        onPressed: () async {
+                                          if (item.quantity <= 1) return;
+                                          final success =
+                                          await _cartRepository.updateQuantity(
+                                            CartItemRequest(
+                                              pizzaId: item.pizzaId,
+                                              quantity: item.quantity - 1,
+                                            ),
+                                            item.id,
+                                          );
+                                          if (success) {
+                                            loadCart();
+                                          }
+                                        },
+                                      ),
+                                      Text(
+                                        "${item.quantity}",
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 18,
+                                        ),
+                                      ),
+                                      IconButton (
+                                        icon: const Icon(Icons.add),
+                                        onPressed: () async {
+                                          final success =
+                                          await _cartRepository.updateQuantity(
+                                            CartItemRequest(
+                                              pizzaId: item.pizzaId,
+                                              quantity: item.quantity + 1,
+                                            ),
+                                            item.id,
+                                          );
+                                          if (success) {
+                                            loadCart();
+                                          }
+                                        },
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () => _showDeleteDialog(item),
+                            icon: Icon(
+                              Icons.delete,
+                              color: Colors.red.withAlpha(80),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(20),
+            margin: const EdgeInsets.only(bottom: 80),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(30),
+              boxShadow: [
+                BoxShadow(
+                  blurRadius: 8,
+                  color: Colors.black26,
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Text(
+                        'Total',
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                      Text(
+                        '\$${totalPrice().toStringAsFixed(2)}',
+                        style: const TextStyle(
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 22,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                SizedBox(
+                  width: 150,
+                  height: 55,
+                  child: ElevatedButton.icon(
+                    icon: const Icon(Icons.shopping_bag),
+                    label: const Text(
+                      "Checkout",
+                      style: TextStyle(
+                        fontSize: 17,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
+                    onPressed: () async {
+                      final result = await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => CheckOutScreen(
+                            cartItems: cartItems,
+                          ),
+                        ),
+                      );
+                      if (result == true) {
+                        loadCart();
+                      }
+                    },
+                  ),
+                )
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  double totalPrice() {
+    double total = 0;
+    for (final item in cartItems) {
+      total += item.pizza!.price * item.quantity;
+    }
+    return total;
+  }
+}
+
