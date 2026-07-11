@@ -110,7 +110,7 @@ class _HomeState extends State<Home> {
           child: Container(
             height: 70,
             decoration: BoxDecoration(
-              color: Colors.white.withAlpha(100),
+              color: Colors.black.withAlpha(100),
               borderRadius: BorderRadius.circular(30),
               border: Border.all(color: Colors.white.withAlpha(60)),
             ),
@@ -402,7 +402,7 @@ class _HomeState extends State<Home> {
         return Center(child: Text("Error: ${snapshot.error}"));
       }
       if (!snapshot.hasData || snapshot.data == null) {
-        return const Center(child: Text("No Data"));
+        return const Center(child: Text("No data"));
       }
       return GridView.builder(
         shrinkWrap: true,

@@ -13,6 +13,8 @@ class CartItemService {
   Future<List<CartItem>> getCartItems() async {
     try {
       final response = await _dio.get('Cart');
+      print(response.statusCode);
+      print(response.data);
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;
         return data.map((json) => CartItem.fromJson(json)).toList();

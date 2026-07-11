@@ -39,6 +39,7 @@ class _CheckOutScreenState extends State<CheckOutScreen> {
       backgroundColor: const Color(0xFF90CAF9),
       appBar: AppBar(
         title: const Text("Payment"),
+        foregroundColor: Colors.white,
         backgroundColor: Colors.transparent,
         elevation: 0,
       ),

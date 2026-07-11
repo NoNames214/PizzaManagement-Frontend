@@ -48,19 +48,28 @@ class _CartScreenState extends State<CartScreen> {
     final result = await showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('Delete Item'),
-        backgroundColor: const Color(0xFFF8F9FA),
-        content: const Text('Are you sure you want to delete this item?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(false),
-            child: const Text('Cancel'),
+          title: Text('Delete Item',
+            style: TextStyle(
+              color: Colors.red,
+            ),
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.of(ctx).pop(true),
-            child: const Text('Delete'),
-          ),
-        ]
+          backgroundColor: const Color(0xFFF8F9FA),
+          content: const Text('Are you sure you want to delete this item?'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(false),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.of(ctx).pop(true),
+              child: Text('Delete',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ]
       ),
     );
     if (result == true) {
@@ -125,6 +134,7 @@ class _CartScreenState extends State<CartScreen> {
                   "My Cart",
                   style: TextStyle(
                     fontSize: 28,
+                    color: Colors.black87,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -136,7 +146,7 @@ class _CartScreenState extends State<CartScreen> {
             child: RefreshIndicator(
               onRefresh: loadCart,
               child: ListView.builder(
-                padding: const EdgeInsets.symmetric(horizontal: 8),
+                padding: const EdgeInsets.symmetric(horizontal: 10),
                 itemCount: cartItems.length,
                 itemBuilder: (context, index) {
                   final item = cartItems[index];
@@ -144,7 +154,7 @@ class _CartScreenState extends State<CartScreen> {
                     margin: const EdgeInsets.only(bottom: 15),
                     elevation: 8,
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(25),
                     ),
                     child: Padding(
                       padding: const EdgeInsets.all(12),
@@ -154,8 +164,8 @@ class _CartScreenState extends State<CartScreen> {
                             borderRadius: BorderRadius.circular(20),
                             child: Image.network(
                               ApiConstant.pizzaImage(item.pizza!.image),
-                              width: 90,
-                              height: 90,
+                              width: 100,
+                              height: 100,
                               fit: BoxFit.cover,
                             ),
                           ),
@@ -188,7 +198,7 @@ class _CartScreenState extends State<CartScreen> {
                                   style: TextStyle(
                                     fontSize: 15,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.grey.withAlpha(80),
+                                    color: Colors.black54,
                                   ),
                                 ),
                                 const SizedBox(height: 10),
@@ -202,11 +212,10 @@ class _CartScreenState extends State<CartScreen> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       IconButton(
-                                        icon: const Icon(Icons.remove),
+                                        icon: const Icon(Icons.remove_circle_outline),
                                         onPressed: () async {
                                           if (item.quantity <= 1) return;
-                                          final success =
-                                          await _cartRepository.updateQuantity(
+                                          final success = await _cartRepository.updateQuantity(
                                             CartItemRequest(
                                               pizzaId: item.pizzaId,
                                               quantity: item.quantity - 1,
@@ -226,7 +235,7 @@ class _CartScreenState extends State<CartScreen> {
                                         ),
                                       ),
                                       IconButton (
-                                        icon: const Icon(Icons.add),
+                                        icon: const Icon(Icons.add_circle_outline),
                                         onPressed: () async {
                                           final success =
                                           await _cartRepository.updateQuantity(
@@ -251,7 +260,8 @@ class _CartScreenState extends State<CartScreen> {
                             onPressed: () => _showDeleteDialog(item),
                             icon: Icon(
                               Icons.delete,
-                              color: Colors.red.withAlpha(80),
+                              color: Colors.red,
+                              size: 25,
                             ),
                           ),
                         ],
@@ -284,14 +294,14 @@ class _CartScreenState extends State<CartScreen> {
                     children: [
                       const Text(
                         'Total',
-                        style: TextStyle(color: Colors.grey),
+                        style: TextStyle(color: Colors.black87),
                       ),
                       Text(
                         '\$${totalPrice().toStringAsFixed(2)}',
                         style: const TextStyle(
                           color: Colors.red,
                           fontWeight: FontWeight.bold,
-                          fontSize: 22,
+                          fontSize: 20,
                         ),
                       ),
                     ],
@@ -305,7 +315,7 @@ class _CartScreenState extends State<CartScreen> {
                     label: const Text(
                       "Checkout",
                       style: TextStyle(
-                        fontSize: 17,
+                        fontSize: 15,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -347,4 +357,3 @@ class _CartScreenState extends State<CartScreen> {
     return total;
   }
 }
-

@@ -58,31 +58,48 @@ class AIRecommendState extends State<AIRecommendScreen> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Padding(
-          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-          child: Text(
-            'Recommend for you',
-            style: TextStyle(
-              fontSize: 26,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
+          padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "✨ Recommendations For You",
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+              ),
+              SizedBox(height: 5),
+              Text(
+                "Based on your recent activities",
+                style: TextStyle(
+                  color: Colors.white70,
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
           ),
         ),
-        _isLoading ? _buildLoading() : _data.isEmpty
-            ? _buildEmptyState() : _buildList(),
+
+        Expanded(
+          child: _isLoading
+              ? _buildLoading()
+              : _data.isEmpty
+              ? _buildEmptyState()
+              : _buildList(),
+        ),
       ],
     );
   }
 
   Widget _buildList() {
     return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 18),
       itemCount: _data.length,
       itemBuilder: (context, index) {
-        final item = _data[index];
-        return _buildAICard(item);
+        return _buildAICard(_data[index]);
       },
     );
   }
@@ -91,142 +108,216 @@ class AIRecommendState extends State<AIRecommendScreen> {
     final Pizza pizza = Pizza(
       id: item['id'] ?? 0,
       name: item['name'] ?? "",
-      price: (item['price'] as num?)?.toDouble() ?? 0.0,
+      price: (item['price'] as num?)?.toDouble() ?? 0,
       image: item['image'] ?? "",
-      toppingsName: [],
+      toppingsName: const [],
       mainIngredient: null,
       isGlutenFree: false,
-      sauce: '',
-      categoryName: '',
+      sauce: "",
+      categoryName: "",
     );
-    debugPrint("UI render: ${pizza.name}");
-    final double score = (item['score'] as num?)?.toDouble() ?? 0.0;
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => PizzaDetailScreen(
-              pizza: pizza,
-              refreshRecommend: loadAIData,
+    final double score = (item['score'] as num?)?.toDouble() ?? 0;
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 18),
+      elevation: 8,
+      shadowColor: Colors.black26,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(22),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(22),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) =>
+                  PizzaDetailScreen(
+                    pizza: pizza,
+                    refreshRecommend: loadAIData,
+                  ),
             ),
-          ),
-        );
-      },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 20),
-        height: 140,
-        decoration: BoxDecoration(
-          color: Colors.white.withAlpha(30),
-          borderRadius: BorderRadius.circular(25),
-          border: Border.all(
-            color: Colors.cyanAccent.withAlpha(50),
-          ),
-        ),
-        child: Row(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(12),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(18),
-                child: Container(
-                  width: 110,
-                  height: 110,
-                  color: Colors.black26,
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(14),
+          child: Row(
+            children: [
+              Hero(
+                tag: pizza.id,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(18),
                   child: Image.network(
                     ApiConstant.pizzaImage(pizza.image),
+                    width: 90,
+                    height: 90,
                     fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      return const Icon(
-                        Icons.local_pizza,
-                        color: Colors.orange,
-                        size: 40,
+                    errorBuilder: (context, error, stacktrace) {
+                      return Container(
+                        width: 110,
+                        height: 110,
+                        color: Colors.grey.shade200,
+                        child: const Icon(
+                          Icons.local_pizza,
+                          size: 45,
+                          color: Colors.orange,
+                        ),
                       );
                     },
                   ),
                 ),
               ),
-            ),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(5, 15, 15, 15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      pizza.name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+
+              const SizedBox(width: 15),
+
+              Expanded(
+                child: SizedBox(
+                  height: 110,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              pizza.name,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight:
+                                FontWeight.bold,
+                              ),
+                            ),
+                          ),
+
+                          Container(
+                            padding:
+                            const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 5,
+                            ),
+                            decoration: BoxDecoration(
+                              color:
+                              Colors.green.shade50,
+                              borderRadius:
+                              BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              "${(score * 10).toStringAsFixed(0)}%",
+                              style: TextStyle(
+                                color:
+                                Colors.green.shade700,
+                                fontWeight:
+                                FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 4,
+
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.auto_awesome,
+                            color: Colors.orange,
+                            size: 18,
+                          ),
+
+                          const SizedBox(width: 5),
+                          Text(
+                            "AI Recommended",
+                            style: TextStyle(
+                              color:
+                              Colors.grey.shade600,
+                            ),
+                          ),
+                        ],
                       ),
-                      decoration: BoxDecoration(
-                        color: Colors.cyanAccent.withAlpha(40),
-                        borderRadius: BorderRadius.circular(10),
+
+                      const Spacer(),
+                      Row(
+                        children: [
+                          Text(
+                            "\$${pizza.price.toStringAsFixed(2)}",
+                            style: const TextStyle(
+                              color: Colors.deepOrange,
+                              fontWeight:
+                              FontWeight.bold,
+                              fontSize: 21,
+                            ),
+                          ),
+
+                          const Spacer(),
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 18,
+                            color: Colors.grey,
+                          ),
+                        ],
                       ),
-                      child: Text(
-                        "${(score * 10).toStringAsFixed(0)}% Match",
-                        style: const TextStyle(
-                          color: Colors.cyanAccent,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    Text(
-                      "\$${pizza.price.toStringAsFixed(2)}",
-                      style: const TextStyle(
-                        color: Colors.orangeAccent,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildLoading() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.only(top: 50),
-        child: Column(
-          children: [
-            const CircularProgressIndicator(color: Colors.cyanAccent),
-            const SizedBox(height: 20),
-            Text(
-              'Analyzing your taste...',
-              style: TextStyle(color: Colors.cyanAccent.withAlpha(150)),
+    return const Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(
+            color: Colors.orange,
+          ),
+          SizedBox(height: 20),
+          Text(
+            "AI is finding pizzas you'll love 🍕",
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 16,
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildEmptyState() {
     return const Center(
-      child: Padding(
-        padding: EdgeInsets.only(top: 50),
-        child: Text(
-          "No recommendations yet.\nTry to explore more pizzas!",
-          textAlign: TextAlign.center,
-          style: TextStyle(color: Colors.white54),
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            Icons.psychology_alt,
+            color: Colors.white38,
+            size: 90,
+          ),
+          SizedBox(height: 20),
+          Text(
+            "No recommendations yet",
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 22,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+
+          SizedBox(height: 10),
+          Text(
+            "Explore more pizzas",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white60,
+            ),
+          ),
+        ],
       ),
     );
   }
