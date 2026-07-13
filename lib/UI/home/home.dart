@@ -7,7 +7,6 @@ import 'package:pizza_management/UI/profile/profile.dart';
 import 'package:pizza_management/UI/review/review.dart';
 import 'package:pizza_management/data/model/pizza.dart';
 import 'package:pizza_management/data/repository/category_repository.dart';
-import 'package:pizza_management/data/repository/pizza_repository.dart';
 import '../../data/api/api_constant.dart';
 import '../../data/model/category.dart';
 import '../pizza_screen/pizza_screen.dart';
@@ -16,10 +15,7 @@ import '../search/search.dart';
 class Home extends StatefulWidget {
   final String token;
 
-  const Home({
-    super.key,
-    required this.token,
-  });
+  const Home({super.key, required this.token});
 
   @override
   State<Home> createState() => _HomeState();
@@ -30,7 +26,6 @@ class _HomeState extends State<Home> {
   int _currentIndex = 0;
   bool isLoading = true;
   late final AIRecommendScreen aiScreen;
-  final _pizzaRepository = PizzaRepository();
   final logger = Logger();
   List<Pizza> pizzas = [];
   final GlobalKey<AIRecommendState> aiKey = GlobalKey<AIRecommendState>();
@@ -41,24 +36,6 @@ class _HomeState extends State<Home> {
     super.initState();
     _categories = CategoryRepository().getCategories();
     aiScreen = AIRecommendScreen(key: aiKey, token: widget.token);
-  }
-
-  Future<void> loadSearch(String keyword) async {
-    try {
-      final data = await _pizzaRepository.searchPizza(keyword);
-      if (!mounted) return;
-      setState(() {
-        pizzas = data;
-        isLoading = false;
-      });
-    }
-    catch(e) {
-      logger.e('Load search Failed: $e');
-      setState(() {
-        pizzas = [];
-        isLoading = false;
-      });
-    }
   }
 
   Future<void> refreshRecommend() async {
@@ -177,10 +154,8 @@ class _HomeState extends State<Home> {
         children: [
           _buildHeader(),
           const SizedBox(height: 25),
-          if (searchController.text.isNotEmpty)
-            _buildSearchResult(),
-          const SizedBox(height: 30),
-          _buildSearchBar(),
+          if (searchController.text.isNotEmpty) const SizedBox(height: 30),
+          _buildSearchBar(context),
           const SizedBox(height: 30),
           _buildTheUsualBanner(),
           const SizedBox(height: 30),
@@ -202,37 +177,36 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget _buildSearchBar() {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(20),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          decoration: BoxDecoration(
-            color: Colors.white.withAlpha(70),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white.withAlpha(70)),
-          ),
-          child: TextField(
-            controller: searchController,
-            onChanged: (value) {
-              if (value.trim().isEmpty) {
-                setState(() {
-                  pizzas.clear();
-                });
-              }
-              else {
-                loadSearch(value);
-              }
-            },
-            style: TextStyle(color: Colors.white),
-            decoration: InputDecoration(
-              hintText: 'Search delicious pizza...',
-              hintStyle: TextStyle(color: Colors.white60),
-              prefixIcon: Icon(Icons.search, color: Colors.white),
-              border: InputBorder.none,
+  Widget _buildSearchBar(BuildContext context) {
+    return Container(
+      height: 50,
+      decoration: BoxDecoration(
+        color: Colors.white.withAlpha(70),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withAlpha(70)),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const SearchScreen(),
+              settings: const RouteSettings(arguments: 1),
             ),
+          );
+        },
+        child: const Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16),
+          child: Row(
+            children: [
+              Icon(Icons.search, color: Colors.white),
+              SizedBox(width: 12),
+              Text(
+                'Search delicious pizza...',
+                style: TextStyle(color: Colors.white60, fontSize: 16),
+              ),
+            ],
           ),
         ),
       ),
@@ -337,60 +311,6 @@ class _HomeState extends State<Home> {
       ],
     ),
   );
-
-  Widget _buildSearchResult() {
-    if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-    if (pizzas.isEmpty) {
-      return Padding(
-        padding: EdgeInsets.all(20),
-        child: Center(
-          child: Text(
-            'No pizza found',
-            style: TextStyle(
-              color: Colors.black87,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      );
-    }
-    return ListView.builder(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: pizzas.length,
-      itemBuilder: (context, index) {
-        final item = pizzas[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 12),
-          child: ListTile(
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: Image.network(
-                ApiConstant.pizzaImage(item.image),
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
-              ),
-            ),
-            title: Text(item.name),
-            subtitle: Text('\$${item.price.toStringAsFixed(2)}'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const SearchScreen(),
-                )
-              );
-            },
-          ),
-        );
-      }
-    );
-  }
 
   Widget _buildMenuGrid() => FutureBuilder<List<Category>>(
     future: _categories,

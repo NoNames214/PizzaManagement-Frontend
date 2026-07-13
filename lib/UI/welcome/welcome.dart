@@ -151,7 +151,7 @@ Widget _buildSignup(BuildContext context) {
         elevation: 5,
       ),
       onPressed: () {
-        Navigator.pushReplacement(
+        Navigator.push(
           context,
           MaterialPageRoute(
               builder: (context) => const SignUp()

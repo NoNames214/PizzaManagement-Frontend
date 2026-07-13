@@ -35,8 +35,8 @@ class Review {
       rating: json['rating'],
       comment: json['comment'],
       createdAt: DateTime.parse(json['createdAt']),
-      user: json['user'] != null ? User.fromJson(json['user']) : null,
-      pizza: json['pizza'] != null ? Pizza.fromJson(json['pizza']) : null,
+      user: json['userResponse'] != null ? User.fromJson(json['userResponse']) : null,
+      pizza: json['pizzaResponse'] != null ? Pizza.fromJson(json['pizzaResponse']) : null,
     );
   }
 
