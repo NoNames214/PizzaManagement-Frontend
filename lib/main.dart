@@ -23,9 +23,34 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.orange,
         useMaterial3: true,
       ),
+
+      builder: (context, child) {
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            if (constraints.maxWidth < 700) {
+              return child!;
+            }
+
+            return Container(
+              color: const Color(0xFFF2F2F2),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(
+                    maxWidth: 500,
+                  ),
+                  child: Material(
+                    elevation: 10,
+                    borderRadius: BorderRadius.circular(20),
+                    clipBehavior: Clip.antiAlias,
+                    child: child!,
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
       home: const Welcome(),
     );
   }
 }
-
-

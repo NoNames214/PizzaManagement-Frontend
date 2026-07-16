@@ -11,7 +11,7 @@ class UserService {
 
   Future<User> getUser() async {
     try {
-      final response = await _dio.get('/User/profile');
+      final response = await _dio.get('User/profile');
       if (response.statusCode == 200) {
         return User.fromJson(response.data);  
       }

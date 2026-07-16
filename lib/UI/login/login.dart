@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:pizza_management/data/repository/auth_repository.dart';
-import 'package:pizza_management/data/service/auth_service.dart';
+import 'package:pizza_management/data/repository/user_repository.dart';
 import '../home/home.dart';
 
 class Login extends StatefulWidget {
@@ -20,6 +20,7 @@ class _LoginState extends State<Login> {
   final TextEditingController _accountController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final AuthRepository _authRepository = AuthRepository();
+  final UserRepository _userRepository = UserRepository();
 
   @override
   void dispose() {
@@ -63,16 +64,17 @@ class _LoginState extends State<Login> {
         );
         logger.i('Login success: $success');
         if (!mounted) return;
-        AuthService().getToken().then((token) {
-          if (token != null && mounted) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => Home(token: token),
-              ),
-            );
-          }
-        });
+        final user = await _userRepository.getUser();
+        logger.i('Role = ${user.role}');
+        final token = await _authRepository.getToken();
+        if (token != null && mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+              builder: (_) => Home(token: token, role: user.role),
+            ),
+          );
+        }
       }
       else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -88,16 +90,18 @@ class _LoginState extends State<Login> {
       }
     }
     catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Error: $e',
-            style: TextStyle(
-              color: Colors.red,
-              fontSize: 20,
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: $e',
+              style: TextStyle(
+                color: Colors.red,
+                fontSize: 20,
+              ),
             ),
           ),
-        ),
-      );
+        );
+      }
       logger.e('Error: $e');
     }
     finally {

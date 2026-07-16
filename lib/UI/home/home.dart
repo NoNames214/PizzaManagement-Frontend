@@ -9,13 +9,19 @@ import 'package:pizza_management/data/model/pizza.dart';
 import 'package:pizza_management/data/repository/category_repository.dart';
 import '../../data/api/api_constant.dart';
 import '../../data/model/category.dart';
+import '../admin/admin.dart';
 import '../pizza_screen/pizza_screen.dart';
 import '../search/search.dart';
 
 class Home extends StatefulWidget {
   final String token;
+  final String ?role;
 
-  const Home({super.key, required this.token});
+  const Home({
+    super.key,
+    required this.token,
+    this.role,
+  });
 
   @override
   State<Home> createState() => _HomeState();
@@ -51,6 +57,8 @@ class _HomeState extends State<Home> {
         aiScreen,
         const ReviewScreen(),
         const Profile(),
+        if (widget.role == "Admin")
+          const AdminScreen(),
       ],
     );
   }
@@ -99,6 +107,8 @@ class _HomeState extends State<Home> {
                 _buildNavItem(Icons.auto_awesome, "AI", 2),
                 _buildNavItem(Icons.reviews_outlined, "Review", 3),
                 _buildNavItem(Icons.person, "Profile", 4),
+                if (widget.role == "Admin")
+                  _buildNavItem(Icons.admin_panel_settings, "Admin", 5),
               ],
             ),
           ),
@@ -226,7 +236,7 @@ class _HomeState extends State<Home> {
   Widget _buildHeader() => Row(
     mainAxisAlignment: MainAxisAlignment.spaceBetween,
     children: [
-      const Column(
+      Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('Bonjour,', style: TextStyle(color: Colors.white70)),
@@ -327,7 +337,7 @@ class _HomeState extends State<Home> {
       return GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
           crossAxisSpacing: 15,
           mainAxisSpacing: 15,

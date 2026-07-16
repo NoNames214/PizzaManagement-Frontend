@@ -359,7 +359,7 @@ class _PizzaDetailScreenState extends State<PizzaDetailScreen> {
             },
           ),
         ],
-      )
+      ),
     );
   }
 

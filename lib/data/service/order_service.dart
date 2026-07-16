@@ -54,7 +54,7 @@ class OrderService {
               }
           )
       );
-      if (response.statusCode == 201 || response.statusCode == 200) {
+      if (response.statusCode == 204) {
         return true;
       }
       else {

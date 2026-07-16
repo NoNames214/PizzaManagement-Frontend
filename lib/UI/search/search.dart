@@ -86,7 +86,7 @@ class _SearchScreenState extends State<SearchScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: EdgeInsets.all(16),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.grey.shade200,

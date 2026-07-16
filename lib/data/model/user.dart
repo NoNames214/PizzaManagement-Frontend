@@ -6,6 +6,7 @@ class User {
   final String avatarUrl;
   final String fullName;
   final String role;
+  final bool isLocked;
 
   User({
     required this.id,
@@ -15,6 +16,7 @@ class User {
     required this.avatarUrl,
     required this.fullName,
     required this.role,
+    this.isLocked = false,
   });
 
   @override
@@ -33,7 +35,8 @@ class User {
         address: json['address'] ?? "",
         avatarUrl: json['avatarUrl'] ?? "",
         fullName: json['fullName'] ?? "",
-        role: json['role'] ?? ""
+        role: json['role'] ?? "",
+        isLocked: json['isLocked'] ?? true,
     );
   }
 

@@ -6,6 +6,7 @@ import 'package:pizza_management/data/model/user.dart';
 import 'package:pizza_management/data/repository/user_repository.dart';
 import 'package:pizza_management/data/service/auth_service.dart';
 
+
 class Profile extends StatefulWidget {
   const Profile({super.key});
 
@@ -149,7 +150,7 @@ class _ProfileState extends State<Profile> {
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
         child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-          padding: const EdgeInsets.all(16),
+          padding: EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white.withAlpha(30),
             borderRadius: BorderRadius.circular(25),

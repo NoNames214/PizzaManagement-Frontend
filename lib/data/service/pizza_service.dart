@@ -54,6 +54,39 @@ class PizzaService {
     }
   }
 
+  Future<bool> deletePizza (int id) async {
+    try {
+      final response = await _dio.delete('Pizza/$id');
+      if (response.statusCode == 204) {
+        return true;
+      }
+      else {
+        throw Exception("Error Server: ${response.statusCode}");
+      }
+    }
+    on DioException catch (e) {
+      throw Exception(e.message);
+    }
+  }
+
+  Future<bool> updatePizza(int id, Map<String, dynamic> data) async {
+    try {
+      final response = await _dio.put(
+          'Pizza/$id',
+          data: data
+      );
+      if (response.statusCode == 200) {
+        return true;
+      }
+      else {
+        throw Exception("Error Server: ${response.statusCode}");
+      }
+    }
+    on DioException catch (e) {
+      throw Exception(e.message);
+    }
+  }
+
   Future<List<Pizza>> searchPizza(String keyword) async {
     try {
       final response = await _dio.get(

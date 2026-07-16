@@ -288,10 +288,10 @@ class AIRecommendState extends State<AIRecommendScreen> {
           SizedBox(height: MediaQuery.of(context).size.height * 0.2),
           const Icon(Icons.psychology_alt, color: Colors.white38, size: 90),
           const SizedBox(height: 20),
-          const Center(
+          Center(
             child: Text(
               "No recommendations yet",
-              style: TextStyle(
+              style: const TextStyle(
                 color: Colors.white,
                 fontSize: 22,
                 fontWeight: FontWeight.bold,

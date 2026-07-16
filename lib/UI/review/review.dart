@@ -117,6 +117,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
       logger.e(e);
     }
 
+    final avatar = item.user?.avatarUrl;
     return Card(
       margin: const EdgeInsets.only(bottom: 18),
       elevation: 2,
@@ -124,7 +125,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
         borderRadius: BorderRadius.circular(18),
       ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -132,23 +133,22 @@ class _ReviewScreenState extends State<ReviewScreen> {
               children: [
                 ClipRRect(
                   borderRadius: BorderRadius.circular(12),
-                  child: Image.network(
-                    ApiConstant.profileImage(item.user?.avatarUrl ?? ""),
+                  child: avatar != null && avatar.isNotEmpty
+                      ? Image.network(
+                    ApiConstant.profileImage(item.user!.avatarUrl),
                     width: 65,
                     height: 65,
                     fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) {
-                      return Container(
-                        width: 65,
-                        height: 65,
-                        color: Colors.grey.shade200,
-                        child: const Icon(
-                          Icons.person,
-                          color: Colors.grey,
-                          size: 35,
-                        ),
-                      );
-                    },
+                  ) :
+                  Container(
+                    width: 65,
+                    height: 65,
+                    color: Colors.grey.shade200,
+                    child: const Icon(
+                      Icons.person,
+                      size: 35,
+                      color: Colors.grey,
+                    ),
                   ),
                 ),
 
