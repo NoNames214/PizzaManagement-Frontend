@@ -40,7 +40,7 @@ class ReviewService {
       }
     }
     on DioException catch (e) {
-      throw Exception(e.message);
+      throw Exception(e.response?.data);
     }
   }
 

@@ -5,10 +5,10 @@ import '../model/pizza.dart';
 class PizzaRepository {
   final PizzaService _pizzaService = PizzaService();
   final logger = Logger();
-
-  Future<List<Pizza>> getPizza(int categoryId) async {
+  
+  Future<List<Pizza>> getPizza() async {
     try {
-      return await _pizzaService.getPizza(categoryId);
+      return await _pizzaService.getPizza();
     }
     catch (e) {
       logger.e("Get Pizza Failed: $e");
@@ -16,12 +16,42 @@ class PizzaRepository {
     }
   }
 
-  Future<bool> createPizza(Map<String, dynamic> data, String filePath) async {
+  Future<List<Pizza>> getPizzaByCategoryId(int categoryId) async {
     try {
-      return await _pizzaService.createPizza(data, filePath);
+      return await _pizzaService.getPizzaByCategoryId(categoryId);
+    }
+    catch (e) {
+      logger.e("Get Pizza Failed: $e");
+      return [];
+    }
+  }
+
+  Future<bool> createPizza(Map<String, dynamic> data) async {
+    try {
+      return await _pizzaService.createPizza(data);
     }
     catch (e) {
       logger.e("Create Pizza Failed: $e");
+      return false;
+    }
+  }
+
+  Future<bool> deletePizza(int id) async {
+    try {
+      return await _pizzaService.deletePizza(id);
+    }
+    catch (e) {
+      logger.e("Delete Pizza Failed: $e");
+      return false;
+    }
+  }
+
+  Future<bool> updatePizza (int id, Map<String, dynamic> data) async {
+    try {
+      return await _pizzaService.updatePizza(id, data);
+    }
+    catch (e) {
+      logger.e("Update Pizza Failed: $e");
       return false;
     }
   }

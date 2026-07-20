@@ -73,7 +73,7 @@ Widget _imageCard(String path) {
     padding: const EdgeInsets.symmetric(horizontal: 10),
     child: ClipRRect(
       borderRadius: BorderRadius.circular(50),
-      child: Image.asset(path, height: 300, width: 250, fit: BoxFit.cover),
+      child: Image.asset(path, height: 350, width: 250, fit: BoxFit.cover),
     ),
   );
 }

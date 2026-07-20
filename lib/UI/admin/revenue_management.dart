@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:pizza_management/data/model/revenue.dart';
 import 'package:pizza_management/data/repository/admin_repository.dart';
 
 class RevenueManagement extends StatefulWidget {
@@ -10,14 +9,13 @@ class RevenueManagement extends StatefulWidget {
 }
 
 class _RevenueManagementState extends State<RevenueManagement> {
-  List<Revenue> revenues = [];
   final AdminRepository _adminRepository = AdminRepository();
   double totalRevenue = 0;
   double averageOrderValue = 0;
   int totalOrders = 0;
   bool isLoading = true;
-  late DateTime startDate;
-  late DateTime endDate;
+  late DateTime startDate = DateTime(DateTime.now().year, DateTime.now().month, 1);
+  late DateTime endDate = DateTime.now();
 
   @override
   void initState() {
@@ -86,7 +84,7 @@ class _RevenueManagementState extends State<RevenueManagement> {
             _buildAverageOrderCard(),
             const SizedBox(height: 20),
 
-            ...revenues.map((e) => _buildRevenueItem()),
+            _buildRevenueItem(),
           ],
         ),
       ),
@@ -159,7 +157,7 @@ class _RevenueManagementState extends State<RevenueManagement> {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Orders"),
+              Text("Total Orders"),
               SizedBox(height: 4),
               Text(
                 "$totalOrders",
@@ -192,7 +190,7 @@ class _RevenueManagementState extends State<RevenueManagement> {
             children: [
               const Text("Average Order"),
               Text(
-                "${averageOrderValue.toStringAsFixed(0)} VNĐ",
+                "${averageOrderValue.toStringAsFixed(0)} \$",
                 style: const TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
@@ -208,7 +206,7 @@ class _RevenueManagementState extends State<RevenueManagement> {
   Widget _buildRevenueItem() {
     return Card(
       elevation: 2,
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 20),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
       ),
@@ -221,19 +219,20 @@ class _RevenueManagementState extends State<RevenueManagement> {
           ),
         ),
         title: Text(
-          "To: ${startDate.day} / ${startDate.month} / ${startDate.year} "
-              "- End: ${endDate.day} / ${endDate.month} / ${endDate.year}",
+          "To: ${startDate.day.toString().padLeft(2, '0')}/${startDate.month}/${startDate.year} \n"
+              "End: ${endDate.day}/${endDate.month}/${endDate.year}",
           style: TextStyle(
             fontWeight: FontWeight.bold,
           ),
         ),
         subtitle: Text(
-          "$totalOrders"
+          "Total Order: $totalOrders",
         ),
         trailing: Text(
-          "${totalRevenue.toStringAsFixed(2)} \$",
+          "Total Revenue: ${totalRevenue.toStringAsFixed(2)} \$",
           style: TextStyle(
             color: Colors.deepOrange,
+            fontSize: 15,
             fontWeight: FontWeight.bold,
           ),
         ),

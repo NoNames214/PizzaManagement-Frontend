@@ -4,9 +4,9 @@ import 'package:pizza_management/UI/pizza_screen/pizza_detail.dart';
 import 'package:pizza_management/data/api/api_constant.dart';
 import 'package:pizza_management/data/repository/ai_repository.dart';
 import 'package:pizza_management/data/repository/auth_repository.dart';
+import 'package:pizza_management/data/repository/pizza_repository.dart';
 import '../../data/ai_recommend/interaction_type.dart';
 import '../../data/model/pizza.dart';
-import '../../data/service/pizza_service.dart';
 
 
 class PizzaScreen extends StatefulWidget {
@@ -27,13 +27,13 @@ class PizzaScreen extends StatefulWidget {
 
 class _PizzaScreenState extends State<PizzaScreen> {
   late Future<List<Pizza>> _pizzas;
-
+  final PizzaRepository _pizzaRepository = PizzaRepository();
 
 
   @override
   void initState() {
     super.initState();
-    _pizzas = PizzaService().getPizza(widget.categoryId);
+    _pizzas = _pizzaRepository.getPizzaByCategoryId(widget.categoryId);
   }
 
   @override

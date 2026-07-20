@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:logger/logger.dart';
 import 'package:pizza_management/data/api/api_constant.dart';
+import 'package:pizza_management/data/model/order_details.dart';
 import 'package:pizza_management/data/model/review.dart';
 import 'package:pizza_management/data/repository/review_repository.dart';
 import 'package:pizza_management/data/request/review_request.dart';
-import '../../data/model/pizza.dart';
+
 
 class ReviewScreen extends StatefulWidget {
-  final Pizza ? pizza;
+  final OrderDetails ? orderDetails;
 
   const ReviewScreen({
     super.key,
-    this.pizza,
+    this.orderDetails,
   });
 
   @override
@@ -33,6 +34,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
   void initState() {
     super.initState();
     loadReviews();
+    logger.i("ReviewScreen init");
   }
 
   @override
@@ -44,6 +46,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
   Future<void> loadReviews() async {
     try {
       final data = await _reviewRepository.getReview();
+      logger.i(data);
       if (!mounted) return;
       setState(() {
         reviews = data;
@@ -135,7 +138,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                   borderRadius: BorderRadius.circular(12),
                   child: avatar != null && avatar.isNotEmpty
                       ? Image.network(
-                    ApiConstant.profileImage(item.user!.avatarUrl),
+                    ApiConstant.profileImage(avatar),
                     width: 65,
                     height: 65,
                     fit: BoxFit.cover,
@@ -254,6 +257,13 @@ class _ReviewScreenState extends State<ReviewScreen> {
   }
 
   void _showWriteReviewBottomSheet() {
+    if (widget.orderDetails == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: Order details is missing!')),
+      );
+      return;
+    }
+    final pizza = widget.orderDetails?.pizza;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -292,7 +302,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                         style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 10),
-                      if (widget.pizza != null)
+                      if (widget.orderDetails != null)
                         Container(
                           padding: const EdgeInsets.all(12),
                           decoration: BoxDecoration(
@@ -304,7 +314,7 @@ class _ReviewScreenState extends State<ReviewScreen> {
                               ClipRRect(
                                 borderRadius: BorderRadius.circular(12),
                                 child: Image.network(
-                                  ApiConstant.pizzaImage(widget.pizza!.image),
+                                  ApiConstant.pizzaImage(pizza!.image),
                                   width: 60,
                                   height: 60,
                                   fit: BoxFit.cover,
@@ -316,14 +326,14 @@ class _ReviewScreenState extends State<ReviewScreen> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      widget.pizza!.name,
+                                      pizza.name,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 16,
                                       ),
                                     ),
                                     Text(
-                                      "\$${widget.pizza!.price.toStringAsFixed(2)}",
+                                      "\$${pizza.price.toStringAsFixed(2)}",
                                       style: const TextStyle(
                                         color: Colors.deepOrange,
                                         fontWeight: FontWeight.bold,
@@ -375,17 +385,20 @@ class _ReviewScreenState extends State<ReviewScreen> {
                           onPressed: () async {
                             final comment = commentController.text.trim();
                             if (comment.isEmpty) return;
-                            if (widget.pizza == null) {
+                            if (pizza == null) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(content: Text('Error: Pizza data is missing!')),
                               );
                               return;
                             }
+                            logger.i(widget.orderDetails!.id);
                             final request = ReviewRequest(
-                              pizzaId: widget.pizza!.id,
+                              pizzaId: pizza.id,
                               rating: rating,
+                              orderDetailsId: widget.orderDetails!.id,
                               comment: comment,
                             );
+                            logger.i(request.toJson());
                             final success = await _reviewRepository.addReview(request);
                             if (success) {
                               commentController.clear();

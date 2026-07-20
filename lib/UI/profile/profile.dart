@@ -6,6 +6,8 @@ import 'package:pizza_management/data/model/user.dart';
 import 'package:pizza_management/data/repository/user_repository.dart';
 import 'package:pizza_management/data/service/auth_service.dart';
 
+import '../order/order.dart';
+
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -48,96 +50,133 @@ class _ProfileState extends State<Profile> {
         }
 
         final user = snapshot.data!;
-        return Column(
-          children: [
-            const SizedBox(height: 20),
-            Center(
-              child: Stack(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(5),
-                    decoration: const BoxDecoration(
-                      color: Colors.white24,
-                      shape: BoxShape.circle,
-                    ),
-                    child: CircleAvatar(
-                      radius: 65,
-                      backgroundColor: Colors.white,
-                      backgroundImage: NetworkImage(ApiConstant.profileImage(user.avatarUrl)),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 5,
-                    right: 5,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
+        return SingleChildScrollView(
+          child: Column(
+            children: [
+              const SizedBox(height: 20),
+              Center(
+                child: Stack(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(5),
                       decoration: const BoxDecoration(
-                        color: Colors.green,
+                        color: Colors.white24,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(
-                        Icons.edit,
-                        color: Colors.white,
-                        size: 18,
+                      child: CircleAvatar(
+                        radius: 65,
+                        backgroundColor: Colors.white,
+                        backgroundImage: NetworkImage(ApiConstant.profileImage(user.avatarUrl)),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 20),
-            Text(
-              user.fullName,
-              style: const TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w900,
-                color: Colors.white,
-              ),
-            ),
-            Text(
-              user.role.toUpperCase(),
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 14,
-                letterSpacing: 2,
-              ),
-            ),
-            const SizedBox(height: 30),
-            _buildInfoTile(Icons.email_rounded, "Email", user.email),
-            _buildInfoTile(Icons.location_on_rounded, "Address", user.address),
-
-            const SizedBox(height: 40),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: ElevatedButton(
-                onPressed: () => _showLogoutDialog(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 55),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                    side: const BorderSide(color: Colors.white30),
-                  ),
-                  elevation: 0,
-                ),
-                child: const Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.logout_rounded),
-                    SizedBox(width: 10),
-                    Text('Logout',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                    Positioned(
+                      bottom: 5,
+                      right: 5,
+                      child: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: const BoxDecoration(
+                          color: Colors.green,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(
+                          Icons.edit,
+                          color: Colors.white,
+                          size: 18,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-            ),
-            const SizedBox(height: 50),
-          ],
+              const SizedBox(height: 20),
+              Text(
+                user.fullName,
+                style: const TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.w900,
+                  color: Colors.white,
+                ),
+              ),
+              Text(
+                user.role.toUpperCase(),
+                style: const TextStyle(
+                  color: Colors.white70,
+                  fontSize: 14,
+                  letterSpacing: 2,
+                ),
+              ),
+              const SizedBox(height: 30),
+              _buildInfoTile(Icons.email_rounded, "Email", user.email),
+              _buildInfoTile(Icons.location_on_rounded, "Address", user.address),
+
+              const SizedBox(height: 30),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const HistoryOrder()),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: Colors.orange,
+                    minimumSize: const Size(double.infinity, 55),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: const BorderSide(color: Colors.white30),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.receipt_long),
+                      SizedBox(width: 10),
+                      Text('History Order',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 30),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 30),
+                child: ElevatedButton(
+                  onPressed: () => _showLogoutDialog(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 55),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                      side: const BorderSide(color: Colors.white30),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.logout_rounded),
+                      SizedBox(width: 10),
+                      Text('Logout',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 100),
+            ],
+          ),
         );
       },
     );

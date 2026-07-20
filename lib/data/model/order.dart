@@ -4,14 +4,14 @@ class Order {
   final int id;
   final double totalPrice;
   final String status;
-  final DateTime orderDate;
+  final DateTime paidAt;
   final List<OrderDetails> orderDetails;
 
   Order({
     required this.id,
     required this.totalPrice,
     required this.status,
-    required this.orderDate,
+    required this.paidAt,
     required this.orderDetails
   });
 
@@ -28,7 +28,7 @@ class Order {
       id: json['id'],
       totalPrice: json['totalPrice'].toDouble(),
       status: json['status'] ?? "",
-      orderDate: DateTime.parse(json['orderDate']),
+      paidAt: DateTime.parse(json['paidAt']),
       orderDetails: json['detailsResponses'] != null
           ? (json['detailsResponses'] as List)
           .map((i) => OrderDetails.fromJson(i))

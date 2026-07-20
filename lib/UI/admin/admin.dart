@@ -1,9 +1,13 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:pizza_management/UI/admin/pizza_management.dart';
 import 'package:pizza_management/UI/admin/revenue_management.dart';
+import 'package:pizza_management/UI/admin/statistic.dart';
 import 'package:pizza_management/UI/admin/user_management.dart';
 
 class AdminScreen extends StatelessWidget {
-  const AdminScreen({super.key});
+  final Category ? category;
+  const AdminScreen({super.key, this.category});
 
   @override
   Widget build(BuildContext context) {
@@ -48,7 +52,14 @@ class AdminScreen extends StatelessWidget {
                     icon: Icons.local_pizza,
                     title: "Pizza",
                     color: Colors.orange,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context)
+                            => const PizzaManagement(),
+                        ),
+                      );
+                    },
                   ),
 
                   _buildCard(
@@ -86,7 +97,14 @@ class AdminScreen extends StatelessWidget {
                     icon: Icons.bar_chart,
                     title: "Statistics",
                     color: Colors.red,
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context)
+                            => const Statistic()
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),

@@ -1,5 +1,4 @@
 import 'package:dio/dio.dart';
-import 'package:path/path.dart';
 import 'package:pizza_management/data/model/pizza.dart';
 import '../interceptor/dio_client.dart';
 
@@ -10,14 +9,14 @@ class PizzaService {
 
   final _dio = DioClient().dio;
 
-  Future<List<Pizza>> getPizza(int categoryId) async {
+  Future<List<Pizza>> getPizza() async {
     try {
       final response = await _dio.get(
-          'Pizza/category/$categoryId',
-          queryParameters: {
-            'pageNumber': 1,
-            'pageSize': 20,
-          }
+        'Pizza',
+        queryParameters: {
+          'pageNumber': 1,
+          'pageSize': 20,
+        }
       );
       if (response.statusCode == 200) {
         List<dynamic> data = response.data;
@@ -32,25 +31,42 @@ class PizzaService {
     }
   }
 
-  Future<bool> createPizza(Map<String, dynamic> data, String filePath) async {
+  Future<List<Pizza>> getPizzaByCategoryId(int categoryId) async {
     try {
-      FormData formData = FormData.fromMap({
-        ...data,
-        'imageFile': await MultipartFile.fromFile(
-            filePath,
-            filename: basename(filePath)
-        ),
-      });
-      final response = await _dio.post('Pizza', data: formData);
-      if (response.statusCode == 201 || response.statusCode == 200) {
-        return true;
+      final response = await _dio.get(
+          'Pizza/category/$categoryId',
+          queryParameters: {
+            'pageNumber': 1,
+            'pageSize': 20,
+          }
+      );
+      if (response.statusCode == 200) {
+        List<dynamic> data = response.data;
+        return data.map((json) => Pizza.fromJson(json)).toList();
       }
       else {
-        throw Exception("Error Server: ${response.statusCode}");
+        throw Exception("Error Server: ${response.data}");
       }
     }
     on DioException catch (e) {
       throw Exception(e.message);
+    }
+  }
+
+  Future<bool> createPizza(Map<String, dynamic> data) async {
+    try {
+      final response = await _dio.post(
+        'Pizza',
+        data: data,
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        return true;
+      } else {
+        throw Exception("Error Server: ${response.statusCode}");
+      }
+    } on DioException catch (e) {
+      throw Exception(e.response!.data);
     }
   }
 
@@ -75,7 +91,7 @@ class PizzaService {
           'Pizza/$id',
           data: data
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode == 204) {
         return true;
       }
       else {
@@ -83,7 +99,7 @@ class PizzaService {
       }
     }
     on DioException catch (e) {
-      throw Exception(e.message);
+      throw Exception(e.response?.data);
     }
   }
 
