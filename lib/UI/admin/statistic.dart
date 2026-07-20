@@ -14,7 +14,7 @@ class Statistic extends StatefulWidget {
 class _StatisticState extends State<Statistic> {
   final AdminRepository _adminsRepository = AdminRepository();
   final logger = Logger();
-  late DateTime startDate = DateTime(DateTime.now().year, DateTime.now().month, 1);
+  late DateTime startDate = DateTime(DateTime.now().year, DateTime.june, 1);
   late DateTime endDate = DateTime.now();
   bool isLoading = true;
   List<RevenueChart> revenueChart = [];

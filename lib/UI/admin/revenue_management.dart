@@ -14,7 +14,7 @@ class _RevenueManagementState extends State<RevenueManagement> {
   double averageOrderValue = 0;
   int totalOrders = 0;
   bool isLoading = true;
-  late DateTime startDate = DateTime(DateTime.now().year, DateTime.now().month, 1);
+  late DateTime startDate = DateTime(DateTime.now().year, DateTime.june, 1);
   late DateTime endDate = DateTime.now();
 
   @override
